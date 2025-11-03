@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Furniture Price Prediction - FastAPI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-top: 10px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        input, select {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .info-text {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 25px;
+            text-align: center;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result h2 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .price {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #1a202c;
+            margin: 10px 0;
+        }
+
+        .details {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .details p {
+            margin: 5px 0;
+            color: #2d3748;
+            font-size: 0.95em;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #c53030;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🪑 Furniture Price Prediction</h1>
+        <p class="subtitle">
+            Powered by FastAPI & Pydantic
+            <span class="badge">ML Model: Decision Tree</span>
+        </p>
+
+        <form action="/predict" method="post">
+            <div class="form-group">
+                <label for="category">Furniture Category:</label>
+                <select name="category" id="category" required>
+                    {% for key, value in categories.items() %}
+                    <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+                <span class="info-text">Select the furniture category</span>
+            </div>
+
+            <div class="features-grid">
+                <div class="form-group">
+                    <label for="sellable_online">Sellable Online:</label>
+                    <select name="sellable_online" id="sellable_online" required>
+                        <option value="0">No (False)</option>
+                        <option value="1">Yes (True)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="other_colors">Other Colors Available:</label>
+                    <select name="other_colors" id="other_colors" required>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="features-grid">
+                <div class="form-group">
+                    <label for="depth">Depth (cm):</label>
+                    <input type="number" name="depth" id="depth" step="0.01" value="40.0" required>
+                    <span class="info-text">Furniture depth in cm</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="height">Height (cm):</label>
+                    <input type="number" name="height" id="height" step="0.01" value="75.0" required>
+                    <span class="info-text">Furniture height in cm</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="width">Width (cm):</label>
+                <input type="number" name="width" id="width" step="0.01" value="80.0" required>
+                <span class="info-text">Furniture width in cm</span>
+            </div>
+
+            <button type="submit">🔮 Predict Price</button>
+        </form>
+
+        {% if error %}
+        <div class="error">
+            <strong>⚠️ Error:</strong> {{ error }}
+        </div>
+        {% endif %}
+
+        {% if prediction is not none %}
+        <div class="result">
+            <h2>💰 Predicted Price</h2>
+            <div class="price">${{ prediction }}</div>
+
+            {% if features %}
+            <div class="details">
+                <p><strong>Category:</strong> {{ category_name }}</p>
+                <p><strong>Dimensions:</strong> {{ features.depth }}cm × {{ features.width }}cm × {{ features.height }}cm</p>
+                <p><strong>Sellable Online:</strong> {{ "Yes" if features.sellable_online == 1 else "No" }}</p>
+                <p><strong>Other Colors:</strong> {{ "Yes" if features.other_colors == 1 else "No" }}</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

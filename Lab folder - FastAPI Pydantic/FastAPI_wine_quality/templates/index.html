@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wine Quality Prediction - FastAPI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #8e2de2;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-top: 10px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        input {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #8e2de2;
+            box-shadow: 0 0 0 3px rgba(142, 45, 226, 0.1);
+        }
+
+        .info-text {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(142, 45, 226, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 30px;
+            text-align: center;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result h2 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .quality-score {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .score {
+            font-size: 3em;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .emoji {
+            font-size: 3em;
+        }
+
+        .rating {
+            display: inline-block;
+            background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #c53030;
+        }
+
+        .section-title {
+            font-size: 1.2em;
+            color: #8e2de2;
+            margin-bottom: 15px;
+            font-weight: 600;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍷 Wine Quality Prediction</h1>
+        <p class="subtitle">
+            Powered by FastAPI & Pydantic
+            <span class="badge">ML Model: Regression</span>
+        </p>
+
+        <form action="/predict" method="post">
+            <div class="section-title">Acidity Properties</div>
+            <div class="features-grid">
+                <div class="form-group">
+                    <label for="fixed_acidity">Fixed Acidity:</label>
+                    <input type="number" name="fixed_acidity" id="fixed_acidity" step="0.1" value="7.4" required>
+                    <span class="info-text">Tartaric acid (g/dm³)</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="volatile_acidity">Volatile Acidity:</label>
+                    <input type="number" name="volatile_acidity" id="volatile_acidity" step="0.01" value="0.70" required>
+                    <span class="info-text">Acetic acid (g/dm³)</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="citric_acid">Citric Acid:</label>
+                    <input type="number" name="citric_acid" id="citric_acid" step="0.01" value="0.00" required>
+                    <span class="info-text">Adds freshness (g/dm³)</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="pH">pH Level:</label>
+                    <input type="number" name="pH" id="pH" step="0.01" value="3.51" required>
+                    <span class="info-text">Scale from 0 to 14</span>
+                </div>
+            </div>
+
+            <div class="section-title">Sugar & Salt</div>
+            <div class="features-grid">
+                <div class="form-group">
+                    <label for="residual_sugar">Residual Sugar:</label>
+                    <input type="number" name="residual_sugar" id="residual_sugar" step="0.1" value="1.9" required>
+                    <span class="info-text">After fermentation (g/dm³)</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="chlorides">Chlorides:</label>
+                    <input type="number" name="chlorides" id="chlorides" step="0.001" value="0.076" required>
+                    <span class="info-text">Salt amount (g/dm³)</span>
+                </div>
+            </div>
+
+            <div class="section-title">Sulfur Dioxide</div>
+            <div class="features-grid">
+                <div class="form-group">
+                    <label for="free_sulfur_dioxide">Free Sulfur Dioxide:</label>
+                    <input type="number" name="free_sulfur_dioxide" id="free_sulfur_dioxide" step="1" value="11" required>
+                    <span class="info-text">Free form (mg/dm³)</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="total_sulfur_dioxide">Total Sulfur Dioxide:</label>
+                    <input type="number" name="total_sulfur_dioxide" id="total_sulfur_dioxide" step="1" value="34" required>
+                    <span class="info-text">Free + bound (mg/dm³)</span>
+                </div>
+            </div>
+
+            <div class="section-title">Physical Properties</div>
+            <div class="features-grid">
+                <div class="form-group">
+                    <label for="density">Density:</label>
+                    <input type="number" name="density" id="density" step="0.0001" value="0.9978" required>
+                    <span class="info-text">g/cm³ (close to water)</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="sulphates">Sulphates:</label>
+                    <input type="number" name="sulphates" id="sulphates" step="0.01" value="0.56" required>
+                    <span class="info-text">Wine additive (g/dm³)</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="alcohol">Alcohol Content:</label>
+                <input type="number" name="alcohol" id="alcohol" step="0.1" value="9.4" required>
+                <span class="info-text">Alcohol percentage (%)</span>
+            </div>
+
+            <button type="submit">🔮 Predict Quality</button>
+        </form>
+
+        {% if error %}
+        <div class="error">
+            <strong>⚠️ Error:</strong> {{ error }}
+        </div>
+        {% endif %}
+
+        {% if prediction is not none %}
+        <div class="result">
+            <h2>Wine Quality Score</h2>
+            <div class="quality-score">
+                <span class="score">{{ prediction }}</span>
+                <span class="emoji">{{ rating_emoji }}</span>
+            </div>
+            <div class="rating">{{ quality_rating }}</div>
+            <p style="margin-top: 15px; color: #666;">Score range: 0 (worst) to 10 (best)</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

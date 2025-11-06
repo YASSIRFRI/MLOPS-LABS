@@ -1,0 +1,106 @@
+# Scala & SBT
+*.class
+*.log
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# SBT specific
+target/
+project/target/
+project/project/target/
+boot/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+.history
+.cache
+.lib/
+
+# Bloop
+.bloop/
+.bsp/
+
+# Metals
+.metals/
+.vscode/metals/
+metals.sbt
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
+.cache-main
+.cache-tests
+
+# Mac
+.DS_Store
+
+# Spark output files
+part-*
+*.parquet
+*.orc
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Machine Learning Models
+*.pkl
+*.h5
+*.pb
+*.pth
+*.onnx
+
+# Data files
+*.csv
+*.tsv
+*.dat
+*.data
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Office temporary files
+~$*.doc*
+~$*.xls*
+~$*.ppt*
